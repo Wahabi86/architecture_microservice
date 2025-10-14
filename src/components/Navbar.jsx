@@ -9,7 +9,7 @@ function Navbar() {
 
   return (
     <>
-      <nav className="flex justify-between items-center px-20 py-4 text-[#00BFFF] bg-gradient-to-b from-black/70 to-transparent fixed top-0 left-0 right-0 z-50">
+      <nav className="flex justify-between items-center px-20 py-4 text-[#00BFFF] bg-gradient-to-b from-black/80 via-black/40 to-black/30 fixed top-0 left-0 right-0 z-50">
         {/* Logo */}
         <NavLink to="/">
           <h1 className="text-2xl font-bold tracking-wide">Mebalih Film</h1>

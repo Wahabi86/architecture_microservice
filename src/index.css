@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+body {
+  @apply bg-[#1F1F1F];
+}
+
+/* Sembunyikan scrollbar tapi tetap bisa scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
