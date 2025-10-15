@@ -186,3 +186,5 @@ export const movieGenre = [
     year: 2013,
   },
 ];
+
+export const genres = ["All Movies", "Action", "Drama", "Comedy", "Horror", "Romance", "Fantasy", "Crime"];

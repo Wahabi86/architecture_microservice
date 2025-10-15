@@ -1,7 +1,21 @@
 @import "tailwindcss";
 
+html,
 body {
+  height: 100%;
+  margin: 0;
   @apply bg-[#1F1F1F];
+}
+
+#root,
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* tinggi layar */
+}
+
+main {
+  flex: 1; /* footer ke bawah */
 }
 
 /* Sembunyikan scrollbar tapi tetap bisa scroll */
@@ -12,4 +26,14 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* Footer */
+.footer {
+  background-color: #333333;
+  text-align: center;
+  padding: 15px 0;
+  width: 100%;
+  margin-top: auto;
+  color: white;
 }

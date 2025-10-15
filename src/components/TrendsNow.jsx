@@ -19,7 +19,7 @@ function TrendsNow() {
 
   return (
     <div>
-      <section className="py-12 px-8 md:px-20 relative">
+      <section className="py-12 px-20 relative">
         <div className="flex items-center gap-4 mb-6">
           <TrendingUp className="text-[#00BFFF] w-13 h-13" />
           <h2 className="text-3xl md:text-4xl font-bold text-white">Trends Now</h2>
