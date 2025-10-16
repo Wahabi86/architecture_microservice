@@ -11,13 +11,13 @@ function Navbar() {
     <>
       <nav className="flex justify-between items-center px-20 py-4 text-[#00BFFF] bg-gradient-to-b from-black/80 via-black/40 to-black/30 fixed top-0 left-0 right-0 z-50">
         {/* Logo */}
-        <NavLink to="/">
+        <NavLink to="/home">
           <h1 className="text-2xl font-bold tracking-wide">Mebalih Film</h1>
         </NavLink>
 
         {/* Menu Navigation */}
         <div className="flex items-center space-x-8">
-          <NavLink to="/" className={({ isActive }) => `transition-all duration-200 font-bold ${isActive ? "text-white" : "hover:text-white "}`}>
+          <NavLink to="/home" className={({ isActive }) => `transition-all duration-200 font-bold ${isActive ? "text-white" : "hover:text-white "}`}>
             Home
           </NavLink>
           <NavLink to="/mylist" className={({ isActive }) => `transition-all duration-200 font-bold ${isActive ? "text-white" : "hover:text-white "}`}>
@@ -44,17 +44,10 @@ function Navbar() {
                 </NavLink>
 
                 {/* Logout */}
-                <button
-                  type="submit"
-                  onClick={() => {
-                    setOpenMenu(false);
-                    console.log("Logout Berhasil");
-                  }}
-                  className="flex items-center w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200 transition-colors font-semibold"
-                >
+                <NavLink to="/login" onClick={() => setOpenMenu(false)} className="flex items-center w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200 transition-colors font-semibold">
                   <LogOut className="w-5 h-5 mr-2" />
                   Keluar
-                </button>
+                </NavLink>
               </div>
             )}
           </div>

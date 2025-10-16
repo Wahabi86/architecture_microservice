@@ -188,3 +188,41 @@ export const movieGenre = [
 ];
 
 export const genres = ["All Movies", "Action", "Drama", "Comedy", "Horror", "Romance", "Fantasy", "Crime"];
+
+export const benefits = [
+  { name: "Premium Only", img: "/src/assets/benefits/premium.svg" },
+  { name: "Early Watching", img: "/src/assets/benefits/early.svg" },
+  { name: "HD Resolution", img: "/src/assets/benefits/hd.svg" },
+  { name: "Offline Access", img: "/src/assets/benefits/wifi.svg" },
+  { name: "No Ads", img: "/src/assets/benefits/noads.svg" },
+  { name: "Multi Access", img: "/src/assets/benefits/multi.svg" },
+];
+
+export const premiumPlans = [
+  {
+    title: "Annual Plans",
+    price: "1.620.000",
+    period: "/year",
+    benefits: ["Renewed automatically", "It can be cancelled anytime"],
+  },
+  {
+    title: "Quarter Plans",
+    price: "125.000",
+    period: "/3 months",
+    benefits: ["Renewed automatically", "It can be cancelled anytime"],
+  },
+  {
+    title: "Monthly Plans",
+    price: "45.000",
+    period: "/month",
+    benefits: ["Renewed automatically", "It can be cancelled anytime"],
+  },
+];
+
+export const payments = [
+  { name: "DANA", img: "/src/assets/payment/dana.svg" },
+  { name: "OVO", img: "/src/assets/payment/ovo.svg" },
+  { name: "GoPay", img: "/src/assets/payment/gopay.svg" },
+  { name: "Transfer Bank", img: "/src/assets/payment/bank.png" },
+];
+

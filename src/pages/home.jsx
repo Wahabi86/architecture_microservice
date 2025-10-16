@@ -2,6 +2,7 @@ import React from "react";
 import { Play, Plus } from "lucide-react";
 import TrendsNow from "../components/TrendsNow";
 import MainMovie from "../components/MainMovie";
+import { NavLink } from "react-router-dom";
 
 export default function Home() {
   return (
@@ -29,10 +30,10 @@ export default function Home() {
 
           {/* Tombol */}
           <div className="flex gap-4 text-lg">
-            <button className="flex items-center gap-2 bg-[#00BFFF] hover:bg-[#00A8E1] text-white font-semibold px-12 py-3 rounded-full transition duration-300">
+            <NavLink to="/rent" className="flex items-center gap-2 bg-[#00BFFF] hover:bg-[#00A8E1] text-white font-semibold px-12 py-3 rounded-full transition duration-300">
               <Play />
               Rent
-            </button>
+            </NavLink>
 
             <button className="flex items-center gap-2 bg-gray-800/90 hover:bg-gray-700 text-white font-semibold px-12 py-3 rounded-full transition duration-300">
               <Plus /> Add List

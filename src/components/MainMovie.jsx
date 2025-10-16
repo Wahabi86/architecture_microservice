@@ -9,7 +9,7 @@ function MainMovie() {
   const filteredMovies = selectedGenre === "All Movies" ? movieGenre : movieGenre.filter((movie) => movie.genre.includes(selectedGenre));
 
   return (
-    <div> 
+    <div>
       <section className="py-12 px-20 relative">
         <div className="flex items-center gap-4 mb-6">
           <Clapperboard className="text-[#00BFFF] w-13 h-13" />
@@ -20,9 +20,8 @@ function MainMovie() {
         {/* Genre Bar */}
         <GenreBar onSelectGenre={setSelectedGenre} />
 
-        {/* All Movie */}
-        <div className="grid grid-cols-5 gap-6 pb-8">
-          {/* Card Film */}
+        {/* All Card Movie */}
+        <div className="grid grid-cols-5 gap-6 pb-12">
           {filteredMovies.slice(0, 15).map((movie) => (
             <div key={movie.id} className="bg-[#2B2B2B] rounded-2xl overflow-hidden shadow-lg flex-shrink-0 snap-start w-72">
               {/* Gambar film */}
