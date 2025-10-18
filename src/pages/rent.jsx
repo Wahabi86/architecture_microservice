@@ -1,7 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { benefits, premiumPlans, payments } from "../data/allData";
+import { X, CircleCheckBig, ChevronDown } from "lucide-react";
 
 function Rent() {
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  // Untuk Transfer Bank
+  const [selectedBank, setSelectedBank] = useState(null);
+  const [showBankDropdown, setShowBankDropdown] = useState(false);
+  const banks = ["BCA", "BNI", "Mandiri", "BRI"];
+
+  const handleRentalClick = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  //  Pada Saat klik metode pembayaran
+  const handlePaymentClick = (method) => {
+    setSelectedPayment(method);
+
+    // Jika memilih Transfer Bank, tampilkan dropdown
+    if (method.name === "Transfer Bank") {
+      setShowBankDropdown(true);
+    } else {
+      setShowBankDropdown(false);
+      setSelectedBank(null);
+    }
+  };
+
+  const handleBankSelect = (bank) => {
+    setSelectedBank(bank);
+    setShowBankDropdown(false);
+  };
+
   return (
     <div className="text-white py-12 px-20 pt-28">
       {/* User Info*/}
@@ -35,7 +71,11 @@ function Rent() {
         <h3 className="text-2xl font-bold mb-6">Premium Plans</h3>
         <div className="grid grid-cols-3 gap-6">
           {premiumPlans.map((plan) => (
-            <div key={plan} className="border border-[#333333] bg-[#333333] rounded-2xl p-6 hover:bg-white/20 hover:border-[#00BFFF]  transition duration-300">
+            <div
+              key={plan}
+              onClick={() => setSelectedPlan(plan)}
+              className={`cursor-pointer border rounded-2xl p-6 transition duration-300 ${selectedPlan?.title === plan.title ? "border-[#00BFFF] bg-[#00BFFF]/20" : "border-[#333333] bg-[#333333] hover:bg-white/10"}`}
+            >
               <h4 className="text-2xl font-bold mb-2">{plan.title}</h4>
               <p className="text-[#00BFFF] text-2xl font-extrabold mb-3">
                 Rp {plan.price}.00
@@ -52,17 +92,99 @@ function Rent() {
       </div>
 
       {/* Payment Method */}
-      <div>
+      <div className="mb-10">
         <h3 className="text-2xl font-bold mb-6">Select Payment Method</h3>
         <div className="grid grid-cols-4 gap-6">
           {payments.map((method) => (
-            <button key={method} className="flex items-center justify-center gap-3 bg-[#333333] hover:bg-white/20 rounded-2xl py-4 px-6 transition duration-300">
-              <img src={method.img} alt={method.name} className="w-8 h-8" />
-              <span className="font-semibold">{method.name}</span>
-            </button>
+            <div key={method.name} className="relative">
+              <button
+                onClick={() => handlePaymentClick(method)}
+                className={`flex items-center justify-center gap-3 w-full rounded-2xl py-4 px-6 transition duration-300 cursor-pointer ${
+                  selectedPayment?.name === method.name ? "bg-[#00BFFF]/20 border border-[#00BFFF]" : "bg-[#333333] hover:bg-white/10"
+                }`}
+              >
+                <img src={method.img} alt={method.name} className="w-8 h-8" />
+                <span className="font-semibold">{method.name}</span>
+                {method.name === "Transfer Bank" && <ChevronDown size={20} className={`transition duration-300 ${showBankDropdown ? "rotate-180" : ""}`} />}
+              </button>
+
+              {/* Section Dropdown pada Transfer Bank */}
+              {method.name === "Transfer Bank" && selectedPayment?.name === "Transfer Bank" && showBankDropdown && (
+                <div className="absolute left-0 right-0 mt-2 bg-[#2a2a2a] border border-[#333333] rounded-xl shadow-lg z-10">
+                  {banks.map((bank) => (
+                    <button key={bank} onClick={() => handleBankSelect(bank)} className="block w-full text-left px-4 py-2 hover:bg-[#00BFFF]/20 transition duration-200">
+                      {bank}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Menampilkan bank yang dipilih */}
+              {method.name === "Transfer Bank" && selectedBank && (
+                <p className="mt-2 text-gray-300 text-center">
+                  Selected Bank: <span className="text-[#00BFFF] font-semibold">{selectedBank}</span>
+                </p>
+              )}
+            </div>
           ))}
         </div>
       </div>
+
+      {/* Tombol Rental Now */}
+      <div className="flex justify-center mt-10">
+        <button
+          onClick={handleRentalClick}
+          disabled={!selectedPlan || !selectedPayment}
+          className={`px-16 py-4 rounded-full font-bold text-lg transition-all duration-300 ${selectedPlan && selectedPayment ? "bg-[#00BFFF] hover:bg-[#0095CC] text-white" : "bg-gray-600 text-gray-400 cursor-not-allowed"}`}
+        >
+          Rental Now
+        </button>
+      </div>
+
+      {/* Section Pop Up */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#1a1a1a] rounded-2xl p-8 max-w-md w-full relative border border-[#333333]">
+            {/* Tombol Close */}
+            <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-white transition duration-200">
+              <X size={24} />
+            </button>
+
+            {/* Icons Success */}
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4">
+                <CircleCheckBig size={64} className="text-[#00BFFF]" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Success!</h2>
+              <p className="text-gray-300 mb-6">
+                You’ve successfully activated your <span className="font-semibold text-white">{selectedPlan?.title}</span> subscription via <span className="font-semibold text-white">{selectedPayment?.name}</span>.
+              </p>
+
+              {/* Info Details */}
+              <div className="bg-[#2a2a2a] rounded-lg p-4 w-full mb-6 text-left">
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-400">Plan:</span>
+                  <span className="text-white font-semibold">{selectedPlan?.title}</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-400">Price:</span>
+                  <span className="text-[#00BFFF] font-bold">Rp {selectedPlan?.price}.00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Payment:</span>
+                  <span className="text-white font-semibold">
+                    {selectedPayment?.name}
+                    {selectedBank && ` (${selectedBank})`}
+                  </span>
+                </div>
+              </div>
+
+              <button onClick={closeModal} className="w-full bg-[#00BFFF] hover:bg-[#0095CC] text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
