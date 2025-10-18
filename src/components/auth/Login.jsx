@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -41,15 +41,15 @@ function Login() {
               {/* CTA Register */}
               <div className="text-center">
                 <span className="text-sm text-gray-400">Don't have an account? </span>
-                <NavLink to="/register" className="text-sm text-[#00BFFF] font-medium hover:text-[#0099CC]">
+                <Link to="/register" className="text-sm text-[#00BFFF] font-medium hover:text-[#0099CC]">
                   Register now
-                </NavLink>
+                </Link>
               </div>
 
               {/* Button Login */}
-              <NavLink to="/home" className="text-center bg-[#00BFFF] text-white py-3 rounded-xl mt-2 font-semibold text-lg hover:bg-[#00A8E1] block">
+              <Link to="/home" className="text-center bg-[#00BFFF] text-white py-3 rounded-xl mt-2 font-semibold text-lg hover:bg-[#00A8E1] block">
                 Login
-              </NavLink>
+              </Link>
             </form>
           </div>
         </div>

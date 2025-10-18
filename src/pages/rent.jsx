@@ -3,7 +3,7 @@ import { benefits, premiumPlans, payments } from "../data/allData";
 
 function Rent() {
   return (
-    <div className="min-h-screen text-white py-12 px-20 pt-28">
+    <div className="text-white py-12 px-20 pt-28">
       {/* User Info*/}
       <div className="flex items-center gap-4 mb-10">
         <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-4xl font-bold text-black">W</div>

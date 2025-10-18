@@ -8,6 +8,7 @@ import EditProfile from "./pages/editprofile";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Rent from "./pages/rent";
+import DetailMovie from "./pages/detailMovie";
 
 function App() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/movie/:id/" element={<DetailMovie />} />
 
           <Route path="/home" element={<Home />} />
           <Route path="/mylist" element={<MyList />} />
