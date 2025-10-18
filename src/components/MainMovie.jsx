@@ -1,13 +1,40 @@
-import React, { useState } from "react";
-import { Clapperboard, Eye, Star } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Clapperboard, Eye, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { allMovies } from "../data/allData";
 import GenreBar from "./GenreBar";
 import { Link } from "react-router-dom";
 
 function MainMovie() {
   const [selectedGenre, setSelectedGenre] = useState("All Movies");
+  const [currentPage, setCurrentPage] = useState(1);
+  const moviesPerPage = 15;
 
   const filteredMovies = selectedGenre === "All Movies" ? allMovies : allMovies.filter((movie) => movie.genre.includes(selectedGenre));
+
+  // Total halaman
+  const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
+  // Ambil data sesuai halaman aktif
+  const startIndex = (currentPage - 1) * moviesPerPage;
+  const endIndex = startIndex + moviesPerPage;
+  const currentMovies = filteredMovies.slice(startIndex, endIndex);
+
+  // Untuk mengatur navigasi halaman
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Untuk mengatur reset halaman pagination saat berubah genre bar
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedGenre]);
 
   return (
     <div>
@@ -23,7 +50,7 @@ function MainMovie() {
 
         {/* All Card Movie */}
         <div className="grid grid-cols-5 gap-6 pb-12">
-          {filteredMovies.slice(0, 15).map((movie) => (
+          {currentMovies.map((movie) => (
             <Link to={`/movie/${movie.id}`} key={movie.id}>
               <div className="bg-[#2B2B2B] rounded-2xl overflow-hidden shadow-lg flex-shrink-0 snap-start w-72 hover:scale-105 transition-transform duration-300">
                 {/* Gambar film */}
@@ -50,7 +77,23 @@ function MainMovie() {
             </Link>
           ))}
         </div>
-        {/* batas akhir */}
+
+        {/* Bagian Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4">
+            <button onClick={handlePrev} disabled={currentPage === 1} className="text-[#00BFFF] disabled:opacity-40">
+              <ChevronLeft />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button key={index} onClick={() => handlePageClick(index + 1)} className={`w-3 h-3 rounded-full ${currentPage === index + 1 ? "bg-[#00BFFF]" : "bg-gray-400"}`}></button>
+            ))}
+
+            <button onClick={handleNext} disabled={currentPage === totalPages} className="text-[#00BFFF] disabled:opacity-40">
+              <ChevronRight />
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );
