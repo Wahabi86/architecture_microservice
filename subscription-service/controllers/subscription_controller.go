@@ -102,3 +102,19 @@ func (sc *SubscriptionController) CreateSubscription(c *gin.Context) {
         "subscription": sub,
     })
 }
+
+func (sc *SubscriptionController) GetMySubscriptions(c *gin.Context) {
+    uidv, _ := c.Get("user_id")
+    userID := uidv.(uint)
+
+    var subs []models.Subscription
+    if err := sc.DB.Where("user_id = ?", userID).Order("start_at DESC").Find(&subs).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error":"failed to fetch subscriptions"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "user_id": userID,
+        "subscriptions": subs,
+    })
+}
