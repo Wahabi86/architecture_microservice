@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { Search, Edit, LogOut } from "lucide-react";
 import { useState } from "react";
+import SearchBar from "./SearchBar";
 
 function Navbar() {
   // mengatur usermenu
@@ -24,11 +25,7 @@ function Navbar() {
             My List
           </NavLink>
 
-          {/* Search Bar */}
-          <div className="relative">
-            <input type="text" placeholder="Search..." className="bg-transparent border border-[#00BFFF] rounded-full px-4 py-1.5 pl-5 w-65 focus:outline-none text-white" />{" "}
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-[#00BFFF] w-5 h-5"></Search>
-          </div>
+          <SearchBar />
 
           {/* Profile */}
           <div className="relative">
@@ -46,7 +43,7 @@ function Navbar() {
                 {/* Logout */}
                 <NavLink to="/login" onClick={() => setOpenMenu(false)} className="flex items-center w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200 transition-colors font-semibold">
                   <LogOut className="w-5 h-5 mr-2" />
-                  Keluar
+                  Logout
                 </NavLink>
               </div>
             )}

@@ -40,7 +40,7 @@ function EditProfile() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full md:w-1/2 bg">
             {/* Nama */}
             <div>
-              <label className="block text-sm font-semibold mb-1">Nama</label>
+              <label className="block text-sm font-semibold mb-1">Name</label>
               <input type="text" name="name" value={inputName} onChange={(e) => setInputName(e.target.value)} className="w-full p-2  border border-[#00BFFF] rounded-md focus:outline-none" />
             </div>
 
@@ -52,7 +52,7 @@ function EditProfile() {
 
             {/* Password */}
             <div className="relative">
-              <label className="block text-sm font-semibold mb-1">Ubah Password</label>
+              <label className="block text-sm font-semibold mb-1">Change Password</label>
               <input type={showPassword ? "text" : "password"} name="password" className="w-full p-2 border border-[#00BFFF] rounded-md focus:outline-none pr-10" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-[35px]   text-[#00BFFF]">
                 {showPassword ? <Eye className="w-5 h-5 " /> : <EyeOff className="w-5 h-5" />}
@@ -61,7 +61,7 @@ function EditProfile() {
 
             {/* Tombol Simpan */}
             <button type="submit" className="bg-[#00BFFF] hover:bg-[#00A4E4] text-white font-semibold py-2 px-4 rounded-md self-end">
-              Simpan
+              Update
             </button>
           </form>
         </div>

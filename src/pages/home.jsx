@@ -10,7 +10,7 @@ export default function Home() {
       <section
         className="relative h-screen bg-cover bg-center flex items-center"
         style={{
-          backgroundImage: "url('/src/assets/background1.jpg')",
+          backgroundImage: "url('/src/assets/background/background1.jpg')",
         }}
       >
         {/* Membuat background lebih gelap */}
@@ -34,10 +34,6 @@ export default function Home() {
               <Play className="fill-white" />
               Rent
             </Link>
-
-            <button className="flex items-center gap-2 bg-gray-800/90 hover:bg-gray-700 text-white font-semibold px-12 py-3 rounded-full transition duration-300">
-              <Plus /> Add List
-            </button>
           </div>
         </div>
       </section>

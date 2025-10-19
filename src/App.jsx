@@ -9,6 +9,7 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Rent from "./pages/rent";
 import DetailMovie from "./pages/detailMovie";
+import ScrollToTop from "./utils/ScrollFeature";
 
 function App() {
   const location = useLocation();
@@ -16,6 +17,8 @@ function App() {
 
   return (
     <div className="app-container">
+      <ScrollToTop />
+
       {!hideNavAndFooter && <Navbar />}
 
       <main>

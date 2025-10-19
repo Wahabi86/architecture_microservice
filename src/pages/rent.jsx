@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { benefits, premiumPlans, payments } from "../data/allData";
-import { X, CircleCheckBig, ChevronDown } from "lucide-react";
+import { CircleCheckBig, ChevronDown } from "lucide-react";
 
 function Rent() {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -144,11 +144,6 @@ function Rent() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-[#1a1a1a] rounded-2xl p-8 max-w-md w-full relative border border-[#333333]">
-            {/* Tombol Close */}
-            <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-white transition duration-200">
-              <X size={24} />
-            </button>
-
             {/* Icons Success */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
