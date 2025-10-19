@@ -3,7 +3,7 @@ package connection
 import (
 	"fmt"
 	"log"
-	"movie-service/models"
+	"be-movie-docker/movie-service/models"
 	"os"
 
 	"gorm.io/driver/postgres"
