@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"movie-service/models"
+	"be-movie-docker/movie-service/models"
 	"net/http"
 	"os"
 	"strconv"

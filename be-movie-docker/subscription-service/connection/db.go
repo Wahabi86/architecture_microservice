@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"subscription-service/models"
+	"be-movie-docker/subscription-service/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -1,9 +1,10 @@
 package connection
 
 import (
+	"be-movie-docker/user-service/models"
 	"fmt"
 	"log"
-	"be-movie-docker/movie-service/models"
+
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -27,8 +28,10 @@ func Connect() *gorm.DB {
 		log.Fatal("Failed to connect DB:", err)
 	}
 
-	db.AutoMigrate(&models.Movie{}, &models.Genre{}, &models.Actor{})
-
+	err = db.AutoMigrate(&models.User{}, &models.Movie{})
+	if err != nil {
+		log.Fatal("Failed to migrate database:", err)
+	}
 	DB = db
 	return db
 }

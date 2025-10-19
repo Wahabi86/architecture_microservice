@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 	"strings"
-	"user-service/models"
-	"user-service/utils"
+	"be-movie-docker/user-service/models"
+	"be-movie-docker/user-service/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

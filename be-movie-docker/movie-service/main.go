@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	"movie-service/connection"
-	"movie-service/controllers"
-	"movie-service/handlers"
+	"be-movie-docker/movie-service/connection"
+	"be-movie-docker/movie-service/controllers"
+	"be-movie-docker/movie-service/handlers"
 
 	"os"
 

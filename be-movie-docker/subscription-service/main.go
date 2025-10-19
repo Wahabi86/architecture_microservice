@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 	"os"
-	"subscription-service/connection"
-	"subscription-service/controllers"
-	"subscription-service/handlers"
+	"be-movie-docker/subscription-service/connection"
+	"be-movie-docker/subscription-service/controllers"
+	"be-movie-docker/subscription-service/handlers"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

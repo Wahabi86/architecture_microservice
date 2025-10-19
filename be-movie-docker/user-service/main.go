@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	"user-service/connection"
-	"user-service/controllers"
-	"user-service/handlers"
+	"be-movie-docker/user-service/connection"
+	"be-movie-docker/user-service/controllers"
+	"be-movie-docker/user-service/handlers"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

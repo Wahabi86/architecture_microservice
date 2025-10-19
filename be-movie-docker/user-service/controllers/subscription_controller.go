@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 	"time"
-	"user-service/models"
+	"be-movie-docker/user-service/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

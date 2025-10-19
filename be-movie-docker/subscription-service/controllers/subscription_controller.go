@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"subscription-service/models"
+	"be-movie-docker/subscription-service/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
