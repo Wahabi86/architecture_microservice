@@ -1,12 +1,20 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Search, Edit, LogOut } from "lucide-react";
 import { useState } from "react";
 import SearchBar from "./SearchBar";
+import { logoutUser } from "../service/authService";
 
 function Navbar() {
   // mengatur usermenu
   const [openMenu, setOpenMenu] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logoutUser(); // hapus token & user
+    setOpenMenu(false);
+    navigate("/login"); // redirect ke halaman login
+  };
 
   return (
     <>
@@ -41,10 +49,10 @@ function Navbar() {
                 </NavLink>
 
                 {/* Logout */}
-                <NavLink to="/login" onClick={() => setOpenMenu(false)} className="flex items-center w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200 transition-colors font-semibold">
+                <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200 transition-colors font-semibold">
                   <LogOut className="w-5 h-5 mr-2" />
                   Logout
-                </NavLink>
+                </button>
               </div>
             )}
           </div>

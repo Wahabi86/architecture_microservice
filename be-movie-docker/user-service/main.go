@@ -1,10 +1,11 @@
 package main
 
 import (
-	"log"
 	"be-movie-docker/user-service/connection"
 	"be-movie-docker/user-service/controllers"
 	"be-movie-docker/user-service/handlers"
+	"log"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -51,6 +52,10 @@ func main() {
 		protected.DELETE("/profile/watchlist/:movieId", wc.RemoveFromWatchlist)
 	}
 
-	log.Println("User service running on :8001")
-	r.Run(":8001")
+	port := os.Getenv("USER_SERVICE_PORT")
+	if port == "" {
+		port = "8001"
+	}
+	log.Println("User service running on :" + port)
+	r.Run(":" + port)
 }

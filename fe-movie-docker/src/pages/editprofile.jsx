@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit, Eye, EyeOff } from "lucide-react";
 
 function EditProfile() {
   // mengatur muncul dan tidaknya password
   const [showPassword, setShowPassword] = useState(false);
 
-  // isi default form nama dan email
-  const [name, setName] = useState("Wahyu Gantenk");
-  const [email] = useState("wahyu@gmail.com");
+  // isi nama dan email
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   // mengatur input nama
   const [inputName, setInputName] = useState(name);
+
+  // ambil data user dari localStorage
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      setName(userData.name);
+      setEmail(userData.email);
+      setInputName(userData.name);
+    }
+  }, []);
 
   // mengatur tombol simpan untuk memperbarui nama
   const handleSubmit = (e) => {
@@ -18,6 +28,7 @@ function EditProfile() {
     setName(inputName);
     alert("Profil Berhasil Disimpan");
   };
+
   return (
     <div className="flex flex-col items-center justify-center px-4 w-full flex-1" style={{ minHeight: "calc(100vh - 120px)" }}>
       {/* Section Utama */}
