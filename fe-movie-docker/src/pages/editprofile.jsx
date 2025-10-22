@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Eye, EyeOff } from "lucide-react";
+import { updateName, changePassword } from "../service/authService";
 
 function EditProfile() {
   // mengatur muncul dan tidaknya password
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // isi nama dan email
+  // setup changepassword
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  // loading untuk disable tombol
+  const [loading, setLoading] = useState(false);
+
+  // data user
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-
-  // mengatur input nama
   const [inputName, setInputName] = useState(name);
 
   // ambil data user dari localStorage
@@ -23,10 +30,62 @@ function EditProfile() {
   }, []);
 
   // mengatur tombol simpan untuk memperbarui nama
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setName(inputName);
-    alert("Profil Berhasil Disimpan");
+    setLoading(true);
+    try {
+      const response = await updateName({ name: inputName });
+      alert(response.message || "Profile updated successfully!");
+
+      // update localStorage dan state
+      const updatedUser = { ...JSON.parse(localStorage.getItem("user")), name: inputName };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setName(inputName);
+    } catch (error) {
+      alert(error.response?.data?.error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Change Password
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!oldPassword || !newPassword) {
+      alert("Please fill in both old and new passwords!");
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await changePassword({
+        old_password: oldPassword,
+        new_password: newPassword,
+      });
+      alert(response.message || "Password updated successfully!");
+      setOldPassword("");
+      setNewPassword("");
+    } catch (error) {
+      alert(error.response?.data?.error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // agar tombol update disable jika tidak ada perubahan di form
+  const isFormChanged = inputName !== name || oldPassword.trim() !== "" || newPassword.trim() !== "";
+
+  // untuk handle informasi setelah menekan tombol update
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    if (inputName !== name && oldPassword === "" && newPassword === "") {
+      handleSubmit(e);
+    } else if (oldPassword && newPassword && inputName === name) {
+      await handleChangePassword(e);
+    } else if (inputName !== name && oldPassword && newPassword) {
+      handleSubmit(e);
+      await handleChangePassword(e);
+    }
   };
 
   return (
@@ -48,7 +107,7 @@ function EditProfile() {
           </div>
 
           {/* Bagian kanan: Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full md:w-1/2 bg">
+          <form onSubmit={handleUpdate} className="flex flex-col gap-4 w-full md:w-1/2 bg">
             {/* Nama */}
             <div>
               <label className="block text-sm font-semibold mb-1">Name</label>
@@ -61,18 +120,31 @@ function EditProfile() {
               <input type="email" name="email" value={email} readOnly className="w-full p-2  border border-[#D9D9D9] rounded-md text-gray-400 cursor-not-allowed" />
             </div>
 
-            {/* Password */}
+            {/* Old Password */}
             <div className="relative">
-              <label className="block text-sm font-semibold mb-1">Change Password</label>
-              <input type={showPassword ? "text" : "password"} name="password" className="w-full p-2 border border-[#00BFFF] rounded-md focus:outline-none pr-10" />
+              <label className="block text-sm font-semibold mb-1">Old Password</label>
+              <input type={showOldPassword ? "text" : "password"} name="old_password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="w-full p-2 border border-[#00BFFF] rounded-md focus:outline-none pr-10" />
+              <button type="button" onClick={() => setShowOldPassword(!showOldPassword)} className="absolute right-3 top-[35px] text-[#00BFFF]">
+                {showOldPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </button>
+            </div>
+
+            {/* New Password */}
+            <div className="relative">
+              <label className="block text-sm font-semibold mb-1">New Password</label>
+              <input type={showPassword ? "text" : "password"} name="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full p-2 border border-[#00BFFF] rounded-md focus:outline-none pr-10" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-[35px]   text-[#00BFFF]">
                 {showPassword ? <Eye className="w-5 h-5 " /> : <EyeOff className="w-5 h-5" />}
               </button>
             </div>
 
             {/* Tombol Simpan */}
-            <button type="submit" className="bg-[#00BFFF] hover:bg-[#00A4E4] text-white font-semibold py-2 px-4 rounded-md self-end">
-              Update
+            <button
+              type="submit"
+              disabled={!isFormChanged || loading}
+              className={`${!isFormChanged || loading ? "bg-gray-500 cursor-not-allowed" : "bg-[#00BFFF] hover:bg-[#00A4E4]"} text-white font-semibold py-2 px-4 rounded-md self-end transition`}
+            >
+              {loading ? "Updating..." : "Update"}
             </button>
           </form>
         </div>

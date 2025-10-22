@@ -17,3 +17,15 @@ export const logoutUser = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
 };
+
+// Change Name
+export const updateName = async (data) => {
+  const res = await apiClient.patch("/profile", data);
+  return res.data;
+};
+
+// Change Password
+export const changePassword = async (data) => {
+  const res = await apiClient.patch("/profile/password", data);
+  return res.data;
+};
