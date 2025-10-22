@@ -12,7 +12,7 @@ import (
 // PATCH /subscribe  -> protected by JWT middleware
 type SubscriptionUpdateRequest struct {
 	SubscriptionType string     `json:"subscription_type" binding:"required"` // monthly, 3months, yearly, none
-	ExpiresAt        *time.Time `json:"expires_at"`                           // optional: if provided, set explicitly
+	ExpiresAt        *time.Time `json:"subscription_expired_at"`              // optional: if provided, set explicitly
 }
 
 type SubscriptionController struct {
@@ -51,5 +51,5 @@ func (sc *SubscriptionController) UpdateUserSubscription(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "subscription updated", "subscription_type": user.SubscriptionType, "expires_at": user.SubscriptionExpiredAt})
+	c.JSON(http.StatusOK, gin.H{"message": "subscription updated", "subscription_type": user.SubscriptionType, "subscription_expired_at": user.SubscriptionExpiredAt})
 }

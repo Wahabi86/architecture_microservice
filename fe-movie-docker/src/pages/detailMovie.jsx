@@ -1,26 +1,93 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { allMovies } from "../data/allData";
 import { Star, Eye, Play, UsersRound, Film, Plus, Minus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { addToMyList, getMyList, removeFromMyList } from "../utils/localStorageHelper";
+import { getMovieById, getMovieRecommendations, getGenres, getActors } from "../service/movieService";
 
 function DetailMovie() {
   const { id } = useParams();
-  const movie = allMovies.find((movie) => movie.id === parseInt(id));
-  const scrollRef = useRef(null);
-
-  // Bagian Add
-  const [isAdded, setIsAdded] = useState(() => {
-    const list = getMyList();
-    return list.some((item) => item.id === movie.id);
-  });
+  const [movie, setMovie] = useState(null);
+  const [similarMovies, setSimilarMovies] = useState([]);
+  const [allActors, setAllActors] = useState([]);
+  const [actorNames, setActorNames] = useState([]);
+  const [allGenres, setAllGenres] = useState([]);
+  const [genreNames, setGenreNames] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isAdded, setIsAdded] = useState(false);  const scrollRef = useRef(null);
 
   // Bagian untuk mengecek movie setiap URL berubah
   useEffect(() => {
-    const list = getMyList();
-    setIsAdded(list.some((item) => item.id === movie.id));
-  }, [id, movie.id]);
+    // Fungsi async di dalam useEffect untuk mengambil data
+    const fetchMovieData = async () => {
+      setIsLoading(true);
+      setError(null);
+      setMovie(null);
+      setActorNames([]);
+      setGenreNames([]);
+      setSimilarMovies([]);
+      setIsAdded(false);
+
+      try {
+        const [
+          fetchedMovie,
+          fetchedRecommendations,
+          currentAllActors,
+          currentAllGenres,
+        ] = await Promise.all([
+          getMovieById(id),
+          getMovieRecommendations(id),
+          allActors.length > 0 ? Promise.resolve(allActors) : getActors(),
+          allGenres.length > 0 ? Promise.resolve(allGenres) : getGenres(),
+        ]);
+
+        // Periksa apakah film berhasil diambil
+        if (!fetchedMovie) {
+          throw new Error("Movie not found");
+        }
+        setMovie(fetchedMovie);
+
+        // Simpan daftar aktor/genre ke state jika baru diambil dari API
+        if (allActors.length === 0) setAllActors(currentAllActors);
+        if (allGenres.length === 0) setAllGenres(currentAllGenres);
+
+        // Simpan rekomendasi film ke state
+        setSimilarMovies(fetchedRecommendations);
+
+        // Mapping Aktor
+        if (fetchedMovie.actors && currentAllActors.length > 0) {
+          const names = fetchedMovie.actors
+            .map(actorId => currentAllActors.find(a => a.id === actorId)?.name)
+            .filter(name => name);
+          setActorNames(names);
+        }
+
+        // Mapping Genre
+        if (fetchedMovie.genre && currentAllGenres.length > 0) {
+            const names = fetchedMovie.genre
+              .map(genreId => currentAllGenres.find(g => g.id === genreId)?.name)
+              .filter(name => name);
+            setGenreNames(names);
+          }
+
+        const list = getMyList();
+        setIsAdded(list.some((item) => item.id === fetchedMovie.id));
+
+      } catch (err) {
+        console.error("Error fetching movie details:", err);
+        if (err.message === "Movie not found") {
+             setError("Film tidak ditemukan.");
+        } else {
+          setError("Gagal memuat detail film.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMovieData();
+  }, [id]);
 
   const handleAddList = () => {
     if (isAdded) {
@@ -31,9 +98,6 @@ function DetailMovie() {
       setIsAdded(true);
     }
   };
-
-  // Untuk filter movie serupa berdasarkan genre
-  const similarMovies = allMovies.filter((otherMovie) => otherMovie.id !== movie.id && otherMovie.genre.some((genre) => movie.genre.includes(genre)));
 
   // Untuk scroll similiar movie
   const scroll = (direction) => {
@@ -48,12 +112,20 @@ function DetailMovie() {
     }
   };
 
+  if (isLoading) {
+    return <div className="text-white text-center pt-40">Loading movie details...</div>;
+  }
+
   return (
     <>
       <div className="text-white px-20 pt-28 flex gap-20">
         {/* Section Kiri */}
-        <div className="flex-shrink-0">
-          <img src={movie.image} alt={movie.title} className="w-[320px] h-[480px] object-cover rounded-2xl shadow-lg" />
+        <div className="flex-shrink-0 mx-auto md:mx-0">
+          <img
+             src={movie.image}
+             alt={movie.title}
+             className="w-[320px] h-[480px] object-cover rounded-2xl shadow-lg"
+          />
         </div>
 
         {/* Section Kanan */}
@@ -67,9 +139,9 @@ function DetailMovie() {
           {/* Durasi & Genre */}
           <div className="flex items-center gap-3 mb-6">
             <span className="bg-[#00BFFF] text-sm font-semibold px-4 py-1 rounded-full">{movie.hour}</span>
-            {movie.genre.map((index) => (
-              <span key={index} className="bg-[#00BFFF]  text-sm font-semibold px-4 py-1 rounded-full">
-                {index}
+            {genreNames.map((name) => (
+              <span key={name} className="bg-[#00BFFF]  text-sm font-semibold px-4 py-1 rounded-full">
+                {name}
               </span>
             ))}
           </div>
@@ -87,12 +159,12 @@ function DetailMovie() {
           </div>
 
           {/* Actors */}
-          <div className="flex items-start gap-2 mb-4">
-            <UsersRound className="w-5 h-5 text-[#00BFFF] mt-0.5" />
-            <p>
-              <span className="font-semibold">Actors:</span> {movie.actors.join(", ")}
-            </p>
-          </div>
+          {actorNames.length > 0 && (
+            <div className="flex items-start gap-2 mb-4">
+              <UsersRound className="w-5 h-5 text-[#00BFFF] mt-0.5" />
+              <p><span className="font-semibold">Actors:</span> {actorNames.join(", ")}</p>
+            </div>
+          )}
 
           {/* Synopsis */}
           <div className="mb-4">
@@ -125,6 +197,7 @@ function DetailMovie() {
       </div>
 
       {/* Section Another Similar Recommend */}
+      {similarMovies.length > 0 && (
       <section className="py-12 px-20 relative">
         <div className="flex items-center gap-4 mb-6">
           <h2 className="text-3xl font-bold text-white">Another Similar Recommend</h2>
@@ -170,6 +243,7 @@ function DetailMovie() {
           )}
         </div>
       </section>
+      )}
     </>
   );
 }

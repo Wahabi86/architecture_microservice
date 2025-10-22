@@ -35,7 +35,6 @@ func main() {
 
 	// Movie public
 	r.GET("/movies", mc.GetMovies)
-	r.GET("/movies/:id", mc.GetMovieByID)
 	r.GET("/movies/trending", mc.GetTrendingMovies)
 	r.GET("/movies/:id/recommendations", mc.GetMovieRecommendations)
 
@@ -52,6 +51,7 @@ func main() {
 	protected.Use(handlers.AuthMiddleware())
 	{
 		protected.POST("/movies", mc.CreateMovie)
+		protected.GET("/movies/:id", mc.GetMovieByID)
 		protected.PATCH("/movies/:id", mc.UpdateMovie)
 		protected.DELETE("/movies/:id", mc.DeleteMovie)
 

@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"net/http"
 	"be-movie-docker/user-service/models"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -38,10 +39,12 @@ func UpdateProfile(db *gorm.DB) gin.HandlerFunc {
 		// Update jika ada perubahan
 		updates := map[string]interface{}{}
 		if req.Name != nil {
-			updates["name"] = *req.Name
-		}
-		if req.Email != nil {
-			updates["email"] = *req.Email
+			trimmedName := strings.TrimSpace(*req.Name)
+			if trimmedName == "" {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "name cannot be empty"})
+				return
+			}
+			updates["name"] = trimmedName
 		}
 
 		// Jika ada field yang diupdate
@@ -50,11 +53,22 @@ func UpdateProfile(db *gorm.DB) gin.HandlerFunc {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update"})
 				return
 			}
-		}
+			// Muat ulang data user setelah update
+			db.First(&user, userID)
+		} else {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "field 'name' is required for update"})
+            return
+        }
 
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Profile updated",
-			"user":    user,
+			"message": "Profile updated successfully",
+			"user": gin.H{
+				"id":                      user.ID,
+				"name":                    user.Name, // Nama yang baru
+				"email":                   user.Email, // Email yang lama (tidak berubah)
+				"subscription_type":       user.SubscriptionType,
+				"subscription_expired_at": user.SubscriptionExpiredAt,
+			},
 		})
 	}
 }
