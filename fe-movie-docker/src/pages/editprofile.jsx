@@ -89,7 +89,7 @@ function EditProfile() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 w-full flex-1" style={{ minHeight: "calc(100vh - 120px)" }}>
+    <div className="flex flex-col items-center justify-center px-4 w-full flex-1 pt-28" style={{ minHeight: "calc(100vh - 120px)" }}>
       {/* Section Utama */}
       <div className="border border-[#00BFFF] rounded-2xl p-8 w-full max-w-4xl bg-[#333333] text-white">
         {/* Header */}
