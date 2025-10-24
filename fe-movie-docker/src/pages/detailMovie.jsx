@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Star, Eye, Play, UsersRound, Film, Plus, Minus, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { addToMyList, getMyList, removeFromMyList } from "../utils/localStorageHelper";
+// import { addToMyList, getMyList, removeFromMyList } from "../utils/localStorageHelper";
 import { getMovieById, getMovieRecommendations, getGenres, getActors } from "../service/movieService";
 import { getProfile, getMyWatchlistIds, addToWatchlist, removeFromWatchlist } from "../service/authService";
 
