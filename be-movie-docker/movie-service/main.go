@@ -37,6 +37,7 @@ func main() {
 	r.GET("/movies", mc.GetMovies)
 	r.GET("/movies/trending", mc.GetTrendingMovies)
 	r.GET("/movies/:id/recommendations", mc.GetMovieRecommendations)
+	r.GET("/movies/batch", mc.GetMoviesByIDs)
 
 	// Genre public
 	r.GET("/genres", gc.ListGenres)

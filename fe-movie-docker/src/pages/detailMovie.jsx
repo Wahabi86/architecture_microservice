@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Star, Eye, Play, UsersRound, Film, Plus, Minus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Eye, Play, UsersRound, Film, Plus, Minus, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { addToMyList, getMyList, removeFromMyList } from "../utils/localStorageHelper";
 import { getMovieById, getMovieRecommendations, getGenres, getActors } from "../service/movieService";
-import { getProfile } from "../service/authService";
+import { getProfile, getMyWatchlistIds, addToWatchlist, removeFromWatchlist } from "../service/authService";
 
 function DetailMovie() {
   const { id } = useParams();
+  const numericId = parseInt(id, 10);
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [similarMovies, setSimilarMovies] = useState([]);
@@ -17,99 +18,115 @@ function DetailMovie() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAdded, setIsAdded] = useState(false);
+  const [isCheckingWatchlist, setIsCheckingWatchlist] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const scrollRef = useRef(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   // Bagian untuk mengecek movie setiap URL berubah
   useEffect(() => {
-    const checkSubscription = async () => {
-      try {
-        const profile = await getProfile();
-
-        if (!profile || profile.subscription_type === "none") {
-          setIsSubscribed(false);
-          setShowModal(true); // menampilkan popup
-          return;
-        }
-
-        // kalau sudah rent
-        setIsSubscribed(true);
-        // Jika user sudah rent ambil data movie
-        fetchMovieData();
-      } catch (err) {
-        console.error("Failed to check subscription status:", err);
-        setShowModal(true);
-      }
-    };
-
-    // Fungsi async di dalam useEffect untuk mengambil data
-    const fetchMovieData = async () => {
+    const checkSubscriptionAndFetchData = async () => {
       setIsLoading(true);
+      setIsCheckingWatchlist(true);
       setError(null);
       setMovie(null);
       setActorNames([]);
       setGenreNames([]);
       setSimilarMovies([]);
       setIsAdded(false);
+      setShowModal(false);
+      setIsSubscribed(false);
 
+      let profileData = null;
       try {
-        const [fetchedMovie, fetchedRecommendations, currentAllActors, currentAllGenres] = await Promise.all([
-          getMovieById(id),
+        profileData = await getProfile();
+        const isCurrentlySubscribed = profileData && profileData.subscription_type !== "none" && profileData.subscription_expired_at && new Date() < new Date(profileData.subscription_expired_at);
+        setIsSubscribed(isCurrentlySubscribed);
+
+        const fetchedMovie = await getMovieById(id);
+
+        if (!fetchedMovie) {
+          throw new Error("Movie not found");
+        }
+
+        const [fetchedRecommendations, currentAllActors, currentAllGenres] = await Promise.all([
           getMovieRecommendations(id),
           allActors.length > 0 ? Promise.resolve(allActors) : getActors(),
           allGenres.length > 0 ? Promise.resolve(allGenres) : getGenres(),
         ]);
 
-        // Periksa apakah film berhasil diambil
-        if (!fetchedMovie) {
-          throw new Error("Movie not found");
-        }
         setMovie(fetchedMovie);
-
-        // Simpan daftar aktor/genre ke state jika baru diambil dari API
+        setSimilarMovies(fetchedRecommendations);
         if (allActors.length === 0) setAllActors(currentAllActors);
         if (allGenres.length === 0) setAllGenres(currentAllGenres);
 
-        // Simpan rekomendasi film ke state
-        setSimilarMovies(fetchedRecommendations);
-
-        // Mapping Aktor
+         // Mapping Aktor
         if (fetchedMovie.actors && currentAllActors.length > 0) {
-          const names = fetchedMovie.actors.map((actorId) => currentAllActors.find((a) => a.id === actorId)?.name).filter((name) => name);
-          setActorNames(names);
+            const names = fetchedMovie.actors
+                .map((actorId) => currentAllActors.find((a) => a.id === actorId)?.name)
+                .filter(Boolean);
+            setActorNames(names);
         }
 
         // Mapping Genre
         if (fetchedMovie.genre && currentAllGenres.length > 0) {
-          const names = fetchedMovie.genre.map((genreId) => currentAllGenres.find((g) => g.id === genreId)?.name).filter((name) => name);
-          setGenreNames(names);
+            const names = fetchedMovie.genre
+                .map((genreId) => currentAllGenres.find((g) => g.id === genreId)?.name)
+                .filter(Boolean);
+            setGenreNames(names);
         }
 
-        const list = getMyList();
-        setIsAdded(list.some((item) => item.id === fetchedMovie.id));
+        try {
+            const watchlistIds = await getMyWatchlistIds();
+            // Cek apakah ID film saat ini (numericId) ada dalam daftar ID dari backend
+            setIsAdded(watchlistIds.includes(numericId));
+        } catch (watchlistError) {
+            console.error("Failed to check watchlist status:", watchlistError);
+            // Tetap lanjutkan meskipun gagal cek watchlist, tombol mungkin tidak akurat
+        } finally {
+             setIsCheckingWatchlist(false);
+        }
+
+
       } catch (err) {
         console.error("Error fetching movie details:", err);
         if (err.message === "Movie not found") {
           setError("Movie not found");
+        } else if (err.message === "Subscription required") {
+            // Tangani error khusus dari getMovieById
+            setError(null);
+            setShowModal(true);
         } else {
           setError("Failed to load movie details.");
         }
       } finally {
         setIsLoading(false);
+        if (error || showModal) {
+            setIsCheckingWatchlist(false);
+        }
       }
     };
 
-    checkSubscription();
+    checkSubscriptionAndFetchData();
   }, [id]);
 
-  const handleAddList = () => {
-    if (isAdded) {
-      removeFromMyList(movie.id);
-      setIsAdded(false);
-    } else {
-      addToMyList(movie);
-      setIsAdded(true);
+  const handleAddList = async() => {
+    if (!movie || !movie.id) return;
+
+    try {
+      if (isAdded) {
+        // Panggil API untuk remove
+        await removeFromWatchlist(movie.id);
+        setIsAdded(false);
+      } else {
+        // Panggil API untuk add
+        await addToWatchlist(movie.id);
+        setIsAdded(true);
+      }
+    } catch (err) {
+      console.error("Failed to update watchlist:", err);
+      // Tampilkan error ke user
+      alert(`Failed to ${isAdded ? 'remove movie from' : 'add movie to'} your list. Please try again.`);
     }
   };
 
@@ -165,7 +182,12 @@ function DetailMovie() {
   }
 
   if (isLoading) {
-    return <div className="text-white text-center pt-40">Loading movie details...</div>;
+    return (
+      <div className="text-white text-center pt-40 flex justify-center items-center">
+        <LoaderCircle className="w-10 h-10 animate-spin text-[#00BFFF]" />
+        <span className="ml-4 text-lg">Loading movie details...</span>
+      </div>
+    );
   }
 
   if (error) {
@@ -245,13 +267,17 @@ function DetailMovie() {
 
             <button
               onClick={handleAddList}
-              className={`font-semibold px-12 py-3 rounded-full flex items-center gap-2 transition-all duration-300 cursor-pointer ${
-                isAdded ? "bg-red-500/20 border border-red-500 text-red-400 hover:bg-red-500/30" : "border border-[#00BFFF] text-[#00BFFF] hover:bg-[#00BFFF]/10"
-              }`}
+              className={`font-semibold px-12 py-3 rounded-full flex items-center gap-2 transition-all duration-300 cursor-pointer 
+                ${isCheckingWatchlist
+                  ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                  : isAdded
+                    ? "bg-red-500/20 border border-red-500 text-red-400 hover:bg-red-500/30"
+                    : "border border-[#00BFFF] text-[#00BFFF] hover:bg-[#00BFFF]/10"
+                }`}
               title={isAdded ? "Remove from My List" : "Add to My List"}
             >
-              {isAdded ? <Minus /> : <Plus />}
-              {isAdded ? "Remove" : "Add List"}
+              {isCheckingWatchlist ? <LoaderCircle className="w-5 h-5 animate-spin" /> : (isAdded ? <Minus className="w-5 h-5"/> : <Plus className="w-5 h-5"/>)}
+              {isCheckingWatchlist ? "Checking..." : (isAdded ? "Remove" : "Add List")}
             </button>
           </div>
         </div>

@@ -218,7 +218,7 @@ func (mc *MovieController) GetTrendingMovies(c *gin.Context) {
     c.JSON(http.StatusOK, out)
 }
 
-// GetMovieByID - GET /movies/:id (public)
+// GetMovieByID - GET /movies/:id
 // movie-service/controllers/movie_controller.go
 
 func (mc *MovieController) GetMovieByID(c *gin.Context) {
@@ -240,9 +240,6 @@ func (mc *MovieController) GetMovieByID(c *gin.Context) {
 		return
 	}
 
-	// =================================================================
-	// PINDAHKAN LOGIKA PENGECEKAN PREMIUM KE SINI (SEBELUM MENGIRIM JSON)
-	// =================================================================
 	if movie.IsPremium {
 		// Middleware seharusnya sudah menempatkan user_id jika token valid
 		_, exists := c.Get("user_id")
@@ -326,6 +323,56 @@ func (mc *MovieController) GetMovieByID(c *gin.Context) {
 	})
 }
 
+func (mc *MovieController) GetMoviesByIDs(c *gin.Context) {
+	idsQuery := c.Query("ids") // Ambil string "1,2,3" dari query parameter 'ids'
+	if idsQuery == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "query parameter 'ids' is required"})
+		return
+	}
+
+	idStrings := strings.Split(idsQuery, ",") // Pisahkan string menjadi ["1", "2", "3"]
+	var movieIDs []uint
+
+	for _, idStr := range idStrings {
+		id64, err := strconv.ParseUint(strings.TrimSpace(idStr), 10, 64) // Konversi string ke uint64
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format in 'ids' parameter"})
+			return
+		}
+		movieIDs = append(movieIDs, uint(id64)) // Tambahkan ke slice uint
+	}
+
+	if len(movieIDs) == 0 {
+		c.JSON(http.StatusOK, []gin.H{}) // Kembalikan array kosong jika tidak ada ID valid
+		return
+	}
+
+	var movies []models.Movie
+	// Gunakan Preload dan Where IN untuk mengambil semua film sekaligus
+	if err := mc.DB.Preload("Genres").Preload("Actors").Where("id IN ?", movieIDs).Find(&movies).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to query movies by ids"})
+		return
+	}
+
+	// Format output seperti GetMovies
+	out := make([]gin.H, 0, len(movies))
+	for _, m := range movies {
+		out = append(out, gin.H{
+			"id":               m.ID,
+			"title":            m.Title,
+			"poster_base_64":   m.PosterBase64,
+			"duration_minutes": m.DurationMinutes,
+			"synopsis":         m.Synopsis,
+			"release_year":     m.ReleaseYear,
+			"rating":           m.Rating,
+			"views":            m.Views,
+			"genres":           genreIDs(m.Genres),
+			"actors":           actorIDs(m.Actors),
+		})
+	}
+	c.JSON(http.StatusOK, out)
+}
+
 func (mc *MovieController) GetMovieRecommendations(c *gin.Context) {
     // 1. Dapatkan ID film utama dari parameter URL
     idParam := c.Param("id")
@@ -386,6 +433,7 @@ func (mc *MovieController) GetMovieRecommendations(c *gin.Context) {
             "synopsis":         m.Synopsis,
             "release_year":     m.ReleaseYear,
             "rating":           m.Rating,
+			"views":            m.Views,
             "genres":           genreIDs(m.Genres), 
             "actors":           actorIDs(m.Actors), 
         })

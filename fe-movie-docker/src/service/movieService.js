@@ -98,6 +98,26 @@ export const getMovieById = async (id) => {
   }
 };
 
+export const getMoviesByIds = async (ids) => {
+  if (!ids || ids.length === 0) {
+    return []; // Kembalikan array kosong jika tidak ada ID
+  }
+  try {
+    const idsString = ids.join(',');
+    // Panggil endpoint baru /movies/batch dengan query parameter 'ids'
+    const endpoint = `/movies/batch?ids=${encodeURIComponent(idsString)}`;
+    console.log(`Fetching movies by IDs from: ${movieApiClient.defaults.baseURL}${endpoint}`);
+    const response = await movieApiClient.get(endpoint);
+
+    // Backend sudah mengembalikan array objek film, tinggal di-transform
+    return Array.isArray(response.data) ? response.data.map(transformMovieData) : [];
+
+  } catch (error) {
+    console.error("Error fetching movies by IDs:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 
 export const getMovieRecommendations = async (id) => {
   try {
