@@ -82,8 +82,6 @@ function MyList() {
     <div className="px-20 pt-28 text-white">
       {/* Header Halaman (Mirip MainMovie) */}
       <div className="flex items-center gap-4 mb-6">
-        {/* Gunakan ikon Clapperboard */}
-        <Clapperboard className="text-[#00BFFF] w-8 h-8 md:w-10 md:h-10" />
         <h1 className="text-3xl md:text-4xl font-bold">My List</h1>
       </div>
       {/* Garis Pemisah */}
