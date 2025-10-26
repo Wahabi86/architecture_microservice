@@ -1,0 +1,106 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: movie_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ./db/movie_rest_dump.sql:/docker-entrypoint-initdb.d/movie_rest_dump.sql
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost || exit 1",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+  user-service:
+    build:
+      context: ./be-movie-docker
+      dockerfile: user-service/Dockerfile
+    container_name: user_service
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      MOVIE_SERVICE_PORT: ${MOVIE_SERVICE_PORT}
+    ports:
+      - "${USER_SERVICE_PORT}:8001"
+
+  movie-service:
+    build:
+      context: ./be-movie-docker
+      dockerfile: movie-service/Dockerfile
+    container_name: movie_service
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      MOVIE_SERVICE_PORT: ${MOVIE_SERVICE_PORT}
+      USER_SERVICE_URL: http://user-service:8001
+    ports:
+      - "${MOVIE_SERVICE_PORT}:8002"
+
+  subscription-service:
+    build:
+      context: ./be-movie-docker
+      dockerfile: subscription-service/Dockerfile
+    container_name: subscription_service
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      SUBSCRIPTION_SERVICE_PORT: ${SUBSCRIPTION_SERVICE_PORT}
+      USER_SERVICE_URL: http://user-service:8001
+    ports:
+      - "${SUBSCRIPTION_SERVICE_PORT}:8003"
+
+  frontend:
+    build: ./fe-movie-docker
+    container_name: fe_movie
+    restart: always
+    environment:
+      VITE_MOVIE_API_URL: http://localhost:8002
+      VITE_SUBSCRIPTION_API_URL: http://localhost:8003
+      VITE_API_URL: http://localhost:8001
+    ports:
+      # host:container — host tetap 3000, container preview Vite 4173
+      - "3000:5173"
+
+volumes:
+  db_data:
