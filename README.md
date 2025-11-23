@@ -1,6 +1,6 @@
 # 🎬 Proyek UTS Arsitektur Mikroservis: Aplikasi Streaming Film
 
-## Kelompok [Nama Kelompok/Angka Kelompok Anda]
+## Kelompok Big Four
 
 Proyek Ujian Tengah Semester (UTS) ini bertujuan untuk mendemonstrasikan implementasi praktis dari arsitektur mikroservis, *containerization* menggunakan Docker, dan orkestrasi menggunakan Docker Compose.
 
@@ -93,7 +93,7 @@ docker compose down
 
 -----
 
-## 🌐 Dokumentasi API Sederhana (Dianjurkan)
+## 🌐 Dokumentasi API Sederhana
 
 ### 1\. User Service (Port 8001)
 
