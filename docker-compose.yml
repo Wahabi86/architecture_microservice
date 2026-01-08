@@ -99,7 +99,6 @@ services:
       VITE_SUBSCRIPTION_API_URL: http://localhost:8003
       VITE_API_URL: http://localhost:8001
     ports:
-      # host:container — host tetap 3000, container preview Vite 4173
       - "3000:5173"
 
 volumes:
