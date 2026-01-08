@@ -1,0 +1,2 @@
+FROM postgres:16-alpine
+COPY movie_rest_dump.sql /docker-entrypoint-initdb.d/movie_rest_dump.sql
