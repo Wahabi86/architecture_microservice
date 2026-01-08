@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: movie-frontend
+  ports:
+    - port: 5173
+      targetPort: 5173
+      nodePort: 30007
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-frontend
+  template:
+    metadata:
+      labels:
+        app: movie-frontend
+    spec:
+      containers:
+        - name: movie-frontend
+          image: movie-frontend:v1
+          ports:
+            - containerPort: 5173
+          env:
+            - name: VITE_MOVIE_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: VITE_MOVIE_API_URL
+            - name: VITE_SUBSCRIPTION_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: VITE_SUBSCRIPTION_API_URL
+            - name: VITE_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: VITE_API_URL

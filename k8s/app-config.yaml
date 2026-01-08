@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  DB_HOST: postgres
+  DB_PORT: '5432'
+  DB_NAME: movie_rest
+  USER_SERVICE_PORT: '8001'
+  MOVIE_SERVICE_PORT: '8002'
+  SUBSCRIPTION_SERVICE_PORT: '8003'
+  USER_SERVICE_URL: http://user-service:8001
+  MOVIE_SERVICE_URL: http://movie-service:8002
+  SUBSCRIPTION_SERVICE_URL: http://subscription-service:8003
+  VITE_MOVIE_API_URL: http://localhost:8002
+  VITE_SUBSCRIPTION_API_URL: http://localhost:8003
+  VITE_API_URL: http://localhost:8001
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+type: Opaque
+stringData:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: '12345'
+  JWT_SECRET: verysecretkey
